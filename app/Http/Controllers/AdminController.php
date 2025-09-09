@@ -8,62 +8,44 @@ use App\Models\Category;
 use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
-    public function __construct()
+    public function dashboard()
     {
-        $this->middleware(function ($request, $next) {
-            if (!Auth::user()->isAdmin()) {
-                return redirect('/')->with('error', 'Access denied.');
-            }
-            return $next($request);
-        });
-    }
-
-     public function dashboard()
-    {
+        // Contoh data statis dulu, bisa diganti ambil dari database
         $totalUsers = User::count();
+        $totalEmployers = User::where('role', 'employer')->count();
         $totalJobs = Job::count();
-        $totalApplications = Application::count();
-        $totalCategories = Category::count();
-
-        $recentUsers = User::latest()->take(5)->get();
-        $recentJobs = Job::with('user')->latest()->take(5)->get();
+        $pendingApplications = 23; // contoh manual
 
         return view('admin.dashboard', compact(
-            'totalUsers', 'totalJobs', 'totalApplications', 
-            'totalCategories', 'recentUsers', 'recentJobs'
+            'totalUsers',
+            'totalEmployers',
+            'totalJobs',
+            'pendingApplications'
         ));
     }
 
-    public function users()
-    {
-        $users = User::latest()->paginate(20);
-        return view('admin.users', compact('users'));
-    }
+    public function categories() {
+        $categories = Category::orderBy('created_at', 'desc')->paginate(10);
+        return view('admin.categories.index', compact('categories'));
+    }  
 
-    public function jobs()
-    {
-        $jobs = Job::with('user')->latest()->paginate(20);
-        return view('admin.jobs', compact('jobs'));
-    }
-
-    public function categories()
-    {
-        $categories = Category::withCount('jobs')->get();
-        return view('admin.categories', compact('categories'));
-    }
-
-    public function storeCategory(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories',
-            'icon' => 'nullable|string|max:255',
+    public function storeCategory(Request $request) {
+        $request->validate([
+            'name' => 'required|string|max:100|unique:categories,name',
+            'icon' => 'nullable|string|max:255'
         ]);
 
-        Category::create($validated);
+        Category::create([
+            'name' => $request->name,
+            'icon' => $request->icon,
+            'slug' => Str::slug($request->name), 
+        ]);
 
-        return redirect()->back()->with('success', 'Category created successfully!');
+        return redirect()->back()->with('success', 'Kategori berhasil di tambah');
     }
+
 }

@@ -62,7 +62,9 @@
                             <a href="{{ route('jobs.show', $job->slug) }}" class="hover:text-blue-600">{{ $job->title
                                 }}</a>
                         </h3>
-                        <p class="text-gray-600 text-sm">{{ $job->user->company_name ?? $job->user->name }}</p>
+                        <p class="text-gray-600 text-sm">
+                            {{ $job->user->employerProfile->company_name ?? $job->user->name }}
+                        </p>
                     </div>
                     <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{{ ucfirst(str_replace('_',
                         ' ', $job->type)) }}</span>

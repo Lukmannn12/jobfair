@@ -71,7 +71,7 @@ class AuthController extends Controller
         }
 
         // Default redirect jika role tidak dikenali
-        return redirect()->route('home')->with('success', 'Login berhasil.');
+        return redirect()->route('admin.dashboard')->with('success', 'Login berhasil.');
     }
 
     // Jika gagal login

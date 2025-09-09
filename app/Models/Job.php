@@ -28,18 +28,18 @@ class Job extends Model
         'category_id',
     ];
 
-    protected $casts = [
-        'benefits' => 'array',
-        'application_deadline' => 'date',
-        'salary_min' => 'decimal:2',
-        'salary_max' => 'decimal:2',
-        'salary_negotiable' => 'boolean',
-    ];
+protected $casts = [
+    'benefits' => 'array',
+    'application_deadline' => 'date',
+    'salary_min' => 'float',
+    'salary_max' => 'float',
+    'salary_negotiable' => 'boolean',
+];
 
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($job) {
             $job->slug = Str::slug($job->title . '-' . Str::random(5));
         });
@@ -67,14 +67,18 @@ class Job extends Model
 
     public function getFormattedSalaryAttribute()
     {
-        if ($this->salary_negotiable) {
-            return 'Salary Negotiable';
-        }
-
         if ($this->salary_min && $this->salary_max) {
             return 'Rp ' . number_format($this->salary_min, 0, ',', '.') . ' - Rp ' . number_format($this->salary_max, 0, ',', '.');
         }
 
-        return 'Not specified';
+        if ($this->salary_min && !$this->salary_max) {
+            return 'Rp ' . number_format($this->salary_min, 0, ',', '.') . ' (min)';
+        }
+
+        if (!$this->salary_min && $this->salary_max) {
+            return 'Rp ' . number_format($this->salary_max, 0, ',', '.') . ' (max)';
+        }
+
+        return $this->salary_negotiable ? 'Negosiasi' : 'Tidak tersedia';
     }
 }

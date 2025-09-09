@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Employer\DashboardController;
 use App\Http\Controllers\EmployerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
@@ -22,7 +23,11 @@ Route::middleware(['auth', 'role:employer'])
     ->prefix('employer')
     ->name('employer.')
     ->group(function () {
-        Route::get('/dashboard', [\App\Http\Controllers\Employer\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/jobs', [DashboardController::class, 'jobs'])->name('jobs');
+        Route::get('/dashboard/jobs/create', [JobController::class, 'create'])->name('jobs.create');
+        Route::post('/jobs', [JobController::class, 'store'])->name('jobs.store');
+        Route::delete('/jobs/{id}', [JobController::class, 'destroy'])->name('jobs.destroy');
     });
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -47,4 +52,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/employer/profile', [ProfileController::class, 'show'])->name('employer.profile.show');
     Route::get('/employer/profile/edit', [ProfileController::class, 'edit'])->name('employer.profile.edit');
     Route::put('/employer/profile/update', [ProfileController::class, 'update'])->name('employer.profile.update');
+});
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/jobs', [AdminController::class, 'jobs'])->name('jobs');
+    Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
+    Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
 });

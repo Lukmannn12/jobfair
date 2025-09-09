@@ -25,7 +25,7 @@
                     @if(auth()->user()->isEmployer())
                     <a href="{{ route('employer.dashboard') }}" class="hover:text-blue-600 transition">Dashboard</a>
                     @elseif(auth()->user()->isAdmin())
-                    <a href="" class="hover:text-blue-600 transition">Admin</a>
+                    <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition">Admin</a>
                     @endif
 
                     <div class="relative group">
@@ -99,6 +99,7 @@
         </div>
     </footer>
 
+    <script src="//unpkg.com/alpinejs" defer></script>
     
     {{-- Toast Notification --}}
     @if(session('success') || session('error'))
